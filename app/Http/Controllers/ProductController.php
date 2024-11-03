@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Http\Request;
@@ -14,7 +16,8 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::all();
+        $query = Product::latest();
+        $products = ProductResource::collection($query->paginate(10));
 
         return inertia('Product/Index', [
             'products' => $products
@@ -54,23 +57,54 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        //
+        return inertia('Product/Show', [
+            'product' => new ProductResource($product)
+        ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Product $product)
+    public function edit($id)
     {
-        //
+        $product = Product::findOrFail($id);
+
+        return inertia('Product/Edit', [
+            'product' => new ProductResource($product),
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product)
+    public function update(Request $request, $id)
     {
-        //
+
+        dd($request->all());
+        // Find the product by ID or fail
+        $product = Product::findOrFail($id);
+
+        // Update product data
+        $product->update($request->all());
+
+        // // Update product data
+        // $product->update([
+        //     'name' => $request->name,
+        //     'price' => $request->price,
+        //     'quantity' => $request->quantity,
+        //     'company' => $request->company,
+        //     'description' => $request->description,
+        // ]);
+
+        // // Handle image upload if a new image is provided
+        // if ($request->hasFile('image')) {
+        //     $imageName = $request->file('image')->store('images', 'public');
+        //     $product->update(['image' => $imageName]);
+        // }
+
+
+
+        return redirect()->route('products.index');
     }
 
     /**

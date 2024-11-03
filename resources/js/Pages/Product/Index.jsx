@@ -6,7 +6,7 @@ const Index = ({ products }) => {
     const { delete: destroy } = useForm();
 
     // Delete a product
-    const destroyproduct = (id) => {
+    const destroyProduct = (id) => {
         destroy(`/products/${id}`);
     };
 
@@ -41,7 +41,7 @@ const Index = ({ products }) => {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
-                        {products.map((product) => (
+                        {products.data.map((product) => (
                             <tr key={product.id}>
                                 <td className="py-2 px-4">{product.name}</td>
                                 <td className="py-2 px-4">{product.company}</td>
@@ -58,7 +58,7 @@ const Index = ({ products }) => {
                                     </Link>
                                     <button
                                         onClick={() =>
-                                            destroyproduct(product.id)
+                                            destroyProduct(product.id)
                                         }
                                         className="text-red-500 hover:text-red-700"
                                     >

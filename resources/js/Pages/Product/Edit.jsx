@@ -12,10 +12,8 @@ export default function Create({ product }) {
             quantity: product.quantity || "",
             price: product.price || "",
             description: product.description || "",
-            image: product.image || null,
+            image: product.image || "",
         });
-
-    console.log(data);
 
     const [newImagePreview, setNewImagePreview] = useState(null);
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -73,6 +71,8 @@ export default function Create({ product }) {
         patch(route("products.update", product.id), {
             onSuccess: () => reset(), // Reset the form upon successful submission
         });
+
+        console.log(data);
     };
 
     return (
@@ -192,7 +192,7 @@ export default function Create({ product }) {
                             <div className="mt-2">
                                 <p className="text-gray-100">Current Image:</p>
                                 <img
-                                    src={product.image}
+                                    src={`/storage/${product.image}`}
                                     alt="Current product"
                                     className="mt-2 h-36 w-36"
                                 />

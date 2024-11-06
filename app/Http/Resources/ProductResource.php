@@ -24,8 +24,6 @@ class ProductResource extends JsonResource
             'company' => $this->company,
             'description' => $this->description,
             'image' => $this->image, //  'image' => $this->image ? Storage::url($this->image) : null,
-            'created_at' => $this->created_at->toDateTimeString(),
-            'updated_at' => $this->updated_at->toDateTimeString(),
         ];
     }
 }

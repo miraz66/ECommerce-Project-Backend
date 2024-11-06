@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,6 +19,7 @@ class ProductFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
+            'user_id' => User::inRandomOrder()->value('id') ?? User::factory(),
             'description' => $this->faker->text(),
             'price' => $this->faker->numberBetween(100, 10000),
             'quantity' => $this->faker->numberBetween(1, 100),

@@ -6,8 +6,11 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use App\Models\Views;
 use Illuminate\Contracts\Cache\Store;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -55,10 +58,26 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Product $product)
+    public function show($id)
     {
+        $product = Product::findOrFail($id);
+        // Log the view
+        if (Auth::check()) {
+            if (Views::where('user_id', Auth::user()->id)->where('product_id', $product->id)->exists()) {
+                Views::where('user_id', Auth::user()->id)->where('product_id', $product->id)->increment('count');
+            } else {
+                Views::create([
+                    'user_id' => Auth::user()->id,
+                    'product_id' => $product->id,
+                    'count' => 1
+                ]);
+            }
+        } else {
+            // Optionally handle guest views if needed
+        }
+
         return inertia('Product/Show', [
-            'product' => new ProductResource($product)
+            'product' => new ProductResource($product),
         ]);
     }
 

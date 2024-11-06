@@ -51,6 +51,12 @@ const Index = ({ products }) => {
                                 <td className="py-2 px-4">${product.price}</td>
                                 <td className="py-2 px-4 space-x-6 float-end">
                                     <Link
+                                        href={`/products/${product.id}`}
+                                        className="text-blue-500 hover:text-blue-700"
+                                    >
+                                        View
+                                    </Link>
+                                    <Link
                                         href={`/products/${product.id}/edit`}
                                         className="text-blue-500 hover:text-blue-700"
                                     >

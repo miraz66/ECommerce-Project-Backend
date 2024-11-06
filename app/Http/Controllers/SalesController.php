@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreSalesRequest;
 use App\Models\Product;
+use App\Models\Profit;
 use App\Models\Revenue;
 use App\Models\Sales;
 use Illuminate\Contracts\Cache\Store;
@@ -49,14 +50,23 @@ class SalesController extends Controller
                 ]);
 
                 // Create revenue record for each item 10%
-                $revenue = $product->price * $item['quantity'] * 0.1;
-
+                $revenue = $product->price * $item['quantity'];
                 Revenue::create([
                     'user_id' => $product->user_id,
                     'product_id' => $item['product_id'],
                     'quantity' => $item['quantity'],
                     'price' => $product->price,
                     'revenue' => $revenue
+                ]);
+
+                // Create Profit record for each item 10%
+                $profit = $product->price * $item['quantity'] * 0.1;
+                Profit::create([
+                    'user_id' => $product->user_id,
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['quantity'],
+                    'price' => $product->price,
+                    'profit' => $profit
                 ]);
             } else {
                 // Handle insufficient stock

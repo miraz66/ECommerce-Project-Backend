@@ -28,6 +28,8 @@ class StoreProductRequest extends FormRequest
             'quantity' => 'required | numeric',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'company' => 'required',
+            'discount' => 'nullable | numeric',
+            'rating' => 'nullable',
         ];
     }
 }

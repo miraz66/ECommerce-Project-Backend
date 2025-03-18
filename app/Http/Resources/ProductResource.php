@@ -23,7 +23,14 @@ class ProductResource extends JsonResource
             'quantity' => $this->quantity,
             'company' => $this->company,
             'description' => $this->description,
-            'image' => $this->image, //  'image' => $this->image ? Storage::url($this->image) : null,
+            'discount' => $this->discount,
+            'rating' => $this->rating,
+            'image' => $this->isExternalImage($this->image) ? $this->image : Storage::url($this->image),
         ];
+    }
+
+    private function isExternalImage($url): bool
+    {
+        return filter_var($url, FILTER_VALIDATE_URL) !== false;
     }
 }

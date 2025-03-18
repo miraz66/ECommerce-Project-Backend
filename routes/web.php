@@ -1,9 +1,12 @@
 <?php
 
+use App\Filters\ProductFilter;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SalesController;
-use App\Models\Sales;
+use App\Http\Resources\ProductResource;
+use App\Models\Cart;
+use App\Models\Product;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -19,7 +22,17 @@ Route::get('/', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
+
+        $query = Product::latest();
+
+        $filteredQuery = ProductFilter::apply($query, request());
+
+        $products = ProductResource::collection($filteredQuery->get());
+
+        return Inertia::render('Dashboard', [
+            'products' => $products,
+            'carts' => Cart::all(),
+        ]);
     })->name('dashboard');
 
     // routes/products.php
@@ -29,12 +42,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');
     Route::get('/products/{id}/edit', [ProductController::class, 'edit'])->name('products.edit');
     Route::patch('/products/{id}', [ProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
 
-    // routes/sales.php
-    Route::get('/sales', [SalesController::class, 'index'])->name('sales.index');
-    Route::get('/sales/create', [SalesController::class, 'create'])->name('sales.create');
-    Route::get('/sales/{id}', [SalesController::class, 'show'])->name('sales.show');
-    Route::post('/sales', [SalesController::class, 'store'])->name('sales.store');
+    // routes/card.php
+    Route::post('/add-to-cart', [CartController::class, 'addToCart'])->name('add-to-cart');
+    Route::delete('/remove-from-cart/{id}', [CartController::class, 'removeFromCart'])->name('remove-from-cart');
 });
 
 

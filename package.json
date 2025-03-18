@@ -3,7 +3,9 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "serve": "php artisan serve",
+        "dev-all": "php artisan serve & vite"
     },
     "devDependencies": {
         "@headlessui/react": "^2.0.0",
@@ -21,6 +23,8 @@
         "vite": "^5.0"
     },
     "dependencies": {
+        "@heroicons/react": "^2.2.0",
+        "framer-motion": "^12.5.0",
         "jspdf": "^2.5.2",
         "jspdf-autotable": "^3.8.4",
         "jsvectormap": "^1.6.0"

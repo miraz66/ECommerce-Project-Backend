@@ -1,7 +1,6 @@
 import { Head, Link, useForm } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 import InputLabel from "@/Components/InputLabel";
-// import SuccessMessage from "@/Components/SuccessMessage";
 import TextInput from "@/Components/TextInput";
 
 export default function Create() {
@@ -13,6 +12,8 @@ export default function Create() {
             price: "",
             image: null,
             description: "",
+            discount: "",
+            rating: "",
         });
 
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -25,16 +26,17 @@ export default function Create() {
                 setShowSuccessMessage(false);
             }, 3000);
 
-            // Cleanup the timeout when the component unmounts or when wasSuccessful changes
+            // Cleanup the timeout
             return () => clearTimeout(timeout);
         }
     }, [wasSuccessful]);
 
+    // Submit the form
     const submit = (e) => {
         e.preventDefault();
 
         post(route("products.store"), {
-            onSuccess: () => reset(), // Reset the form upon successful submission
+            onSuccess: () => reset(),
         });
     };
 
@@ -56,7 +58,7 @@ export default function Create() {
                 <form onSubmit={submit}>
                     {/* Name Field */}
                     <div className="mt-4">
-                        <InputLabel htmlFor="name" value="Name" />
+                        <InputLabel htmlFor="name" value="Product Name" />
                         <TextInput
                             id="name"
                             name="name"
@@ -65,6 +67,7 @@ export default function Create() {
                             onChange={(e) => setData("name", e.target.value)}
                             className="mt-1 block w-full"
                             autoComplete="name"
+                            required
                         />
                         {errors.name && (
                             <div className="text-sm text-red-600">
@@ -87,6 +90,7 @@ export default function Create() {
                             onChange={(e) => setData("company", e.target.value)}
                             className="mt-1 block w-full"
                             autoComplete="companyName"
+                            required
                         />
                         {errors.company && (
                             <div className="text-sm text-red-600">
@@ -108,6 +112,7 @@ export default function Create() {
                             }
                             className="mt-1 block w-full"
                             autoComplete="quantity"
+                            required
                         />
                         {errors.quantity && (
                             <div className="text-sm text-red-600">
@@ -127,10 +132,33 @@ export default function Create() {
                             onChange={(e) => setData("price", e.target.value)}
                             className="mt-1 block w-full"
                             autoComplete="price"
+                            required
                         />
                         {errors.price && (
                             <div className="text-sm text-red-600">
                                 {errors.price}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Discount Field */}
+                    <div className="mt-4">
+                        <InputLabel htmlFor="discount" value="Discount" />
+                        <TextInput
+                            id="discount"
+                            name="discount"
+                            type="number"
+                            value={data.discount}
+                            onChange={(e) =>
+                                setData("discount", e.target.value)
+                            }
+                            className="mt-1 block w-full"
+                            autoComplete="discount"
+                            required
+                        />
+                        {errors.discount && (
+                            <div className="text-sm text-red-600">
+                                {errors.discount}
                             </div>
                         )}
                     </div>
@@ -147,6 +175,7 @@ export default function Create() {
                             }
                             className="mt-1 block w-full cursor-pointer"
                             autoComplete="image"
+                            required
                         />
                         {errors.image && (
                             <div className="text-sm text-red-600">
@@ -167,6 +196,7 @@ export default function Create() {
                             onChange={(e) =>
                                 setData("description", e.target.value)
                             }
+                            required
                         ></textarea>
                         {errors.description && (
                             <div className="text-sm text-red-600">

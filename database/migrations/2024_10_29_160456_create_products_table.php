@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->string('company');
             $table->string('description');
+            $table->integer('discount');
+            $table->integer('rating');
             $table->timestamps();
         });
     }

@@ -1,7 +1,7 @@
 import { Head, Link, useForm } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 import InputLabel from "@/Components/InputLabel";
-// import SuccessMessage from "@/Components/SuccessMessage";
+import SuccessMessage from "@/Components/SuccessMessage";
 import TextInput from "@/Components/TextInput";
 
 export default function Create({ product }) {
@@ -15,8 +15,8 @@ export default function Create({ product }) {
             image: product.image || "",
         });
 
-    const [newImagePreview, setNewImagePreview] = useState(null);
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
     useEffect(() => {
         if (wasSuccessful) {
             setShowSuccessMessage(true);
@@ -26,62 +26,28 @@ export default function Create({ product }) {
                 setShowSuccessMessage(false);
             }, 3000);
 
-            // Cleanup the timeout when the component unmounts or when wasSuccessful changes
+            // Cleanup the timeout
             return () => clearTimeout(timeout);
         }
     }, [wasSuccessful]);
 
-    // const handleImageChange = (e) => {
-    //     const file = e.target.files[0];
-    //     setData("image", file);
-
-    //     if (file) {
-    //         const reader = new FileReader();
-    //         reader.onloadend = () => {
-    //             setNewImagePreview(reader.result);
-    //         };
-    //         reader.readAsDataURL(file);
-    //     } else {
-    //         setNewImagePreview(null);
-    //     }
-    // };
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            // Set the new image in the form data
-            setData("image", file);
-
-            // Create a preview for the new image
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setNewImagePreview(reader.result);
-            };
-            reader.readAsDataURL(file);
-        } else {
-            // If no file is selected, reset the image data to an empty array to indicate removal
-            setData("image", []);
-            setNewImagePreview(null);
-        }
-    };
-
+    // Submit the form
     const submit = (e) => {
         e.preventDefault();
 
         patch(route("products.update", product.id), {
-            onSuccess: () => reset(), // Reset the form upon successful submission
+            onSuccess: () => reset(),
+            preserveScroll: true,
         });
-
-        console.log(data);
     };
 
     return (
         <div className="bg-gray-600 min-h-screen pt-40">
             <Head title="Create" />
 
-            {/* {showSuccessMessage && (
-                <SuccessMessage message="product created successfully!" />
-            )} */}
+            {showSuccessMessage && (
+                <SuccessMessage message="Product updated successfully" />
+            )}
 
             <div className="max-w-3xl mx-auto p-10 shadow-xl shadow-gray-700">
                 <h1 className="text-2xl font-bold mb-4 text-gray-100">
@@ -166,50 +132,6 @@ export default function Create({ product }) {
                         {errors.price && (
                             <div className="text-sm text-red-600">
                                 {errors.price}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Image Upload */}
-                    <div className="mt-4">
-                        <InputLabel htmlFor="image" value="Image" />
-                        <TextInput
-                            id="image"
-                            name="image"
-                            type="file"
-                            onChange={handleImageChange}
-                            accept="image/*"
-                            className="mt-1 block w-full cursor-pointer"
-                        />
-                        {errors.image && (
-                            <div className="text-sm text-red-600">
-                                {errors.image}
-                            </div>
-                        )}
-
-                        {/* Display old image if it exists */}
-                        {product.image && !newImagePreview && (
-                            <div className="mt-2">
-                                <p className="text-gray-100">Current Image:</p>
-                                <img
-                                    src={`/storage/${product.image}`}
-                                    alt="Current product"
-                                    className="mt-2 h-36 w-36"
-                                />
-                            </div>
-                        )}
-
-                        {/* Display new image preview */}
-                        {newImagePreview && (
-                            <div className="mt-2">
-                                <p className="text-gray-100">
-                                    New Image Preview:
-                                </p>
-                                <img
-                                    src={newImagePreview}
-                                    alt="New preview"
-                                    className="mt-2 h-36 w-36"
-                                />
                             </div>
                         )}
                     </div>

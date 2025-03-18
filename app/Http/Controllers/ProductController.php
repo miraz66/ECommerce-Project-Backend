@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\ProductFilter;
 use App\Http\Requests\StoreProductRequest;
-use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Models\Views;
-use Illuminate\Contracts\Cache\Store;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -20,10 +19,15 @@ class ProductController extends Controller
     public function index()
     {
         $query = Product::latest();
-        $products = ProductResource::collection($query->paginate(10));
+
+        $filteredQuery = ProductFilter::apply($query, request());
+
+        $products = ProductResource::collection($filteredQuery->paginate(20));
+
 
         return inertia('Product/Index', [
-            'products' => $products
+            'products' => $products,
+            'filters' => request()->all(['search', 'category', 'min_price', 'max_price']),
         ]);
     }
 
@@ -44,12 +48,15 @@ class ProductController extends Controller
             ->store('images', 'public') : null;
 
         Product::create([
+            'user_id' => Auth::id(),
             'name' => $request->name,
             'price' => $request->price,
             'quantity' => $request->quantity,
             'company' => $request->company,
             'description' => $request->description,
-            'image' => $imageName
+            'image' => $imageName,
+            'discount' => $request->discount,
+            'rating' => rand(0, 5),
         ]);
 
         return redirect()->route('products.index');
@@ -61,6 +68,7 @@ class ProductController extends Controller
     public function show($id)
     {
         $product = Product::findOrFail($id);
+
         // Log the view
         if (Auth::check()) {
             if (Views::where('user_id', Auth::user()->id)->where('product_id', $product->id)->exists()) {
@@ -72,8 +80,6 @@ class ProductController extends Controller
                     'count' => 1
                 ]);
             }
-        } else {
-            // Optionally handle guest views if needed
         }
 
         return inertia('Product/Show', [
@@ -98,28 +104,23 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-
-        dd($request->all());
         // Find the product by ID or fail
         $product = Product::findOrFail($id);
 
         // Update product data
-        $product->update($request->all());
+        $product->update([
+            'name' => $request->name,
+            'price' => $request->price,
+            'quantity' => $request->quantity,
+            'company' => $request->company,
+            'description' => $request->description,
+        ]);
 
-        // // Update product data
-        // $product->update([
-        //     'name' => $request->name,
-        //     'price' => $request->price,
-        //     'quantity' => $request->quantity,
-        //     'company' => $request->company,
-        //     'description' => $request->description,
-        // ]);
-
-        // // Handle image upload if a new image is provided
-        // if ($request->hasFile('image')) {
-        //     $imageName = $request->file('image')->store('images', 'public');
-        //     $product->update(['image' => $imageName]);
-        // }
+        // Handle image upload if a new image is provided
+        if ($request->hasFile('image')) {
+            $imageName = $request->file('image')->store('images', 'public');
+            $product->update(['image' => $imageName]);
+        }
 
 
 
@@ -129,8 +130,15 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Product $product)
+    public function destroy($id)
     {
-        //
+        $product = Product::findOrFail($id);
+        $product->delete();
+
+        if ($product->image) {
+            Storage::disk('public')->delete($product->image);
+        }
+
+        return redirect()->route('products.index')->with('success', 'Product and image deleted successfully.');
     }
 }

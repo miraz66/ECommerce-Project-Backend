@@ -9,22 +9,30 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
-        Schema::create('views', function (Blueprint $table) {
+        Schema::create('carts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->integer('count');
+            $table->string('name');
+            $table->integer('quantity');
+            $table->decimal('price', 10, 2);
+            $table->string('image');
+            $table->string('company');
+            $table->text('description');
+            $table->decimal('discount', 5, 2)->nullable();
+            $table->decimal('rating', 3, 2)->nullable();
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('views');
+        Schema::dropIfExists('carts');
     }
 };
